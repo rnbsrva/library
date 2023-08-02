@@ -3,14 +3,16 @@ package com.akerke.demo.service.impl;
 import com.akerke.demo.dao.AuthorDAO;
 import com.akerke.demo.dao.BookDAO;
 import com.akerke.demo.dto.AuthorDTO;
+import com.akerke.demo.dto.AuthorResponceDTO;
 import com.akerke.demo.model.Author;
 import com.akerke.demo.model.Book;
 import com.akerke.demo.service.AuthorService;
+import com.akerke.demo.wrapper.BookWrapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
@@ -24,27 +26,26 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<Author> getAll() {
+    public List<AuthorResponceDTO> getAll() {
         List<Author> authors = authorDAO.getAll();
-
+        List<AuthorResponceDTO> authorResponce = new ArrayList<>();
         for(Author author : authors) {
-            List<Book> books = bookDAO.getAll().stream()
-                    .filter(book -> Objects.equals(book.getAuthor(), author.getId()))
-                    .collect(Collectors.toList());
-            author.setBooks(books);
+            List<BookWrapper> bookWrappers = bookDAO.getAll().stream()
+                    .filter(bookWrapper -> Objects.equals(bookWrapper.getAuthorId(), author.getId()))
+                    .toList();
+            AuthorResponceDTO authorResponceDTO = new AuthorResponceDTO(author.getId(), author.getName(), author.getSurname(), bookWrappers);
+            authorResponce.add(authorResponceDTO);
         }
-
-        return authors;
+        return authorResponce;
     }
 
     @Override
-    public Author getById(Long id) {
+    public AuthorResponceDTO getById(Long id) {
         Author author = authorDAO.getById(id);
-        List<Book> books = bookDAO.getAll().stream()
-                .filter(book -> Objects.equals(book.getAuthor(), author.getId()))
-                .collect(Collectors.toList());
-        author.setBooks(books);
-        return author;
+        List<BookWrapper> bookWrappers = bookDAO.getAll().stream()
+                .filter(bookWrapper -> Objects.equals(bookWrapper.getAuthorId(), id))
+                .toList();
+        return new AuthorResponceDTO(id, author.getName(), author.getSurname(), bookWrappers);
     }
 
     @Override
@@ -54,14 +55,9 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public boolean delete(Long id) {
-        Author author= authorDAO.getById(id);
-        List<Book> books = bookDAO.getAll().stream()
-                .filter(book -> Objects.equals(book.getAuthor(), author.getId()))
-                .collect(Collectors.toList());
-        author.setBooks(books);
-        for (Book book : author.getBooks()) {
-            bookDAO.delete(book.getId());
-        }
+        bookDAO.getAll().stream()
+                .filter(bookWrapper -> Objects.equals(bookWrapper.getAuthorId(), id))
+                .forEach(bookWrapper -> bookDAO.delete(bookWrapper.getId()));
         return authorDAO.delete(id);
     }
 }

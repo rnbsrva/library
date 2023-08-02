@@ -3,6 +3,7 @@ package com.akerke.demo.dao;
 import com.akerke.demo.dto.BookDTO;
 import com.akerke.demo.mapper.BookMapper;
 import com.akerke.demo.model.Book;
+import com.akerke.demo.wrapper.BookWrapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,12 @@ public class BookDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Book> getAll(){
+    public List<BookWrapper> getAll(){
         final String query = "SELECT * FROM book";
         return jdbcTemplate.query(query, new BookMapper());
     }
 
-    public Book getById(Long id) {
+    public BookWrapper getById(Long id) {
         final String query = "SELECT * FROM book WHERE book_id="+id;
         return jdbcTemplate.query(query, new BookMapper()).get(0);
     }
@@ -33,7 +34,7 @@ public class BookDAO {
     }
 
     public boolean delete (Long id) {
-        Book book = getById(id);
+        BookWrapper book = getById(id);
         if(book==null) {
             return false;
         }

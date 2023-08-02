@@ -1,5 +1,7 @@
 package com.akerke.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class Author {
@@ -7,6 +9,7 @@ public class Author {
     private String name;
     private String surname;
     private List<Book> books;
+
 
     public Author(Long id, String name, String surname, List<Book> books) {
         this.id = id;
