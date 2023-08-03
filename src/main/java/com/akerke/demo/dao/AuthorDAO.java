@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -43,5 +44,12 @@ public class AuthorDAO {
         return true;
     }
 
+    public boolean update (AuthorDTO authorDTO) {
+        if(getById(authorDTO.id())==null) {
+            return false;
+        }
+        jdbcTemplate.update("UPDATE author SET name = ?, surname = ? WHERE author_id = ?", authorDTO.name(), authorDTO.surname(), authorDTO.id());
+        return true;
+    }
 
 }

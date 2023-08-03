@@ -3,6 +3,7 @@ package com.akerke.demo.service.impl;
 import com.akerke.demo.dao.AuthorDAO;
 import com.akerke.demo.dao.BookDAO;
 import com.akerke.demo.dto.AuthorDTO;
+import com.akerke.demo.dto.AuthorRequestDTO;
 import com.akerke.demo.dto.BookDTO;
 import com.akerke.demo.dto.BookResponceDTO;
 import com.akerke.demo.model.Author;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -54,5 +56,29 @@ public class BookServiceImpl implements BookService {
     @Override
     public boolean delete(Long id) {
         return bookDAO.delete(id);
+    }
+
+    @Override
+    public boolean update(Long id, BookDTO bookDTO) {
+        return bookDAO.update(bookDTO, id);
+    }
+
+    @Override
+    public boolean updatePartially(Long id, Map<String, Object> bookUpdatedFields) {
+        BookWrapper bookWrapper = bookDAO.getById(id);
+        String name = bookWrapper.getName();
+        String description = bookWrapper.getDescription();
+        Long authorId = bookWrapper.getAuthorId();
+        for (Map.Entry<String, Object> entry : bookUpdatedFields.entrySet()) {
+            String field = entry.getKey();
+            Object value = entry.getValue();
+            switch (field) {
+                case "name" -> name = (String)value;
+                case "description" -> description = (String) value;
+                case "authorId" -> authorId = (Long) value;
+            }
+        }
+        BookDTO bookDTO = new BookDTO(name, description, authorId);
+        return bookDAO.update(bookDTO, id);
     }
 }

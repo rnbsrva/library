@@ -1,5 +1,6 @@
 package com.akerke.demo.dao;
 
+import com.akerke.demo.dto.AuthorDTO;
 import com.akerke.demo.dto.BookDTO;
 import com.akerke.demo.mapper.BookMapper;
 import com.akerke.demo.model.Book;
@@ -39,6 +40,14 @@ public class BookDAO {
             return false;
         }
         jdbcTemplate.update("DELETE FROM book WHERE book_id="+id);
+        return true;
+    }
+
+    public boolean update (BookDTO bookDTO, Long id) {
+        if(getById(id)==null) {
+            return false;
+        }
+        jdbcTemplate.update("UPDATE book SET name = ?, description = ?, author_id = ? WHERE book_id = ?", bookDTO.name(), bookDTO.description(), bookDTO.authorId(), id);
         return true;
     }
 

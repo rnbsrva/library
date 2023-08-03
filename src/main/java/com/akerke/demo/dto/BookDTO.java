@@ -4,4 +4,6 @@ public record BookDTO (
     String name,
     String description,
     Long authorId
-){}
+){
+
+}
